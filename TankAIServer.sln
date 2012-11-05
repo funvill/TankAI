@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TankAIServer", "TankAIServer\TankAIServer.vcxproj", "{3FDA0F0D-ECBD-4EA0-879A-CC8EFC585130}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TankAIBot", "TankAIBot\TankAIBot.vcxproj", "{4C11E283-27F3-4D9B-8D8A-B1B80A2614AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FDA0F0D-ECBD-4EA0-879A-CC8EFC585130}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3FDA0F0D-ECBD-4EA0-879A-CC8EFC585130}.Debug|Win32.Build.0 = Debug|Win32
+		{3FDA0F0D-ECBD-4EA0-879A-CC8EFC585130}.Release|Win32.ActiveCfg = Release|Win32
+		{3FDA0F0D-ECBD-4EA0-879A-CC8EFC585130}.Release|Win32.Build.0 = Release|Win32
+		{4C11E283-27F3-4D9B-8D8A-B1B80A2614AE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4C11E283-27F3-4D9B-8D8A-B1B80A2614AE}.Debug|Win32.Build.0 = Debug|Win32
+		{4C11E283-27F3-4D9B-8D8A-B1B80A2614AE}.Release|Win32.ActiveCfg = Release|Win32
+		{4C11E283-27F3-4D9B-8D8A-B1B80A2614AE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
