@@ -45,10 +45,18 @@ void CTankAIBase::ActionRadar() {
 }
 CTankAIBase::ResponseEnum CTankAIBase::CheckResponse() {
 	
-	return CTankAIBase::PASS ;
+	
 	
 	std::string response ; 
-	std::cin >> response ; 
+	// std::cin >> response ;
+
+	// ToDo: if this is a radar ping then there will be information about all the other objects in the map. 
+	// Fake data 
+	m_objects.clear(); 
+	m_objects.push_back( CTankAIObject( CTankAIObject::enemy, (char ) rand() % 256 , (char ) rand() % 256 ) ); 
+	m_objects.push_back( CTankAIObject( CTankAIObject::projectile, (char ) rand() % 256 , (char ) rand() % 256 ) ); 
+
+	return CTankAIBase::PASS ; // Debug 
 
 	if( response.compare("pass") == 0 ) {
 		return CTankAIBase::PASS ;
