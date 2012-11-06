@@ -15,7 +15,9 @@
 #define	TANK_ACTION_RADAR	"radar"
 
 #define TANK_RESPONSE_PASS	"pass"
-#define TANK_RESPONSE_FAIL	"fail"
+
+#define TANK_OBJECT_TYPE_ENEMY		"enemy"
+#define TANK_OBJECT_TYPE_PROJECTILE	"projectile"
 
 class CTankAIObject 
 {
@@ -24,18 +26,20 @@ public:
 		enemy, projectile
 	};
 
+	unsigned int m_UUID ; 
 	TypeEnum m_type ; 
 	char m_dx ; 
 	char m_dy ; 
 
-	void Set( TypeEnum type, char dx, char dy ) {
+	void Set( unsigned int UUID, TypeEnum type, char dx, char dy ) {
+		this->m_UUID = UUID ; 
 		this->m_type = type ; 
 		this->m_dx = dx ; 
 		this->m_dy = dy ; 
 	}
 
-	CTankAIObject( TypeEnum type, char dx, char dy ) {
-		this->Set( type, dx, dy ); 
+	CTankAIObject( unsigned int UUID, TypeEnum type, char dx, char dy ) {
+		this->Set( UUID, type, dx, dy ); 
 	}
 
 };
@@ -61,6 +65,7 @@ class CTankAIBase
 	private:
 		void DoAction( std::string action, std::string commands ); 
 		std::string DirectionToString( DirectionsEnum dir ); 
+		void ProcessRadarResponse( std::string response ); 
 
 };
 
