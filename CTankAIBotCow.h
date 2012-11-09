@@ -2,18 +2,21 @@
  *  Tank AI Programming challenge
  *
  *  Written by: Steven Smethurst 
- *  Created: Nov 04, 2012 
+ *  Created: Nov 08, 2012 
  * 
  ******************************************************************************/
+
 #pragma once
 #include "ctankaibase.h"
+#include "CTankAction.h"
+#include "CTankAIBotCow.h"
 
-class CTankAIBotRandom : public CTankAIBase
+class CTankAIBotCow : public CTankAIBase
 {
-private:
-	DirectionsEnum GetRandomDirection(); 
+	private:
+		CTankAction::DirectionsEnum GetRandomDirection(); 
 
-public:
-	void Run(); 
+	public:
+		std::string Go( std::string command ) ; 
 };
 

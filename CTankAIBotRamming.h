@@ -8,16 +8,19 @@
 
 #pragma once
 #include "ctankaibase.h"
-class CTankAIBotRamming :
-	public CTankAIBase
+#include "CTankAction.h"
+
+class CTankAIBotRamming : public CTankAIBase
 {
+	private:
+		CTankAction::DirectionsEnum m_enemyDirection ; 
+		unsigned int CalculateDistance ( char x, char y); 	
+		void UpdateEnemyDirection() ; 
 
-private:
-	DirectionsEnum m_enemyDirection ; 
-	unsigned int CalculateDistance ( char x, char y); 	
+	public:
+		CTankAIBotRamming(); 
+		std::string Go( std::string command ) ; 
 
-public:
-
-	void Run(); 
+	
 };
 

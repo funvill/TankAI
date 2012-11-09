@@ -79,16 +79,22 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CTankAction.h" />
     <ClInclude Include="CTankAIBase.h" />
+    <ClInclude Include="CTankAIBotCow.h" />
     <ClInclude Include="CTankAIBotRamming.h" />
     <ClInclude Include="CTankAIBotRandom.h" />
+    <ClInclude Include="CTankAIServer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CTankAction.cpp" />
     <ClCompile Include="CTankAIBase.cpp" />
+    <ClCompile Include="CTankAIBotCow.cpp" />
     <ClCompile Include="CTankAIBotRamming.cpp" />
     <ClCompile Include="CTankAIBotRandom.cpp" />
+    <ClCompile Include="CTankAIServer.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

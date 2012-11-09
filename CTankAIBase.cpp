@@ -10,75 +10,34 @@
 #include <iostream>
 #include <regex>
 
-void CTankAIBase::DoAction( std::string action, std::string commands ) {
-	printf( "%s %s\n", action.c_str(), commands.c_str() ); 
-}
-std::string CTankAIBase::DirectionToString( DirectionsEnum dir ) {
-	switch( dir ) {	
-		case CTankAIBase::NORTH: {
-			return "north" ;
-			break ;
-		}
-		case CTankAIBase::EAST: {
-			return "east" ;
-			break ;
-		}
-		case CTankAIBase::SOUTH: {
-			return "south" ;
-			break ;
-		}
-		default:
-		case CTankAIBase::WEST: {
-			return "west" ;
-			break ;
-		}
-	}
-}
 
-void CTankAIBase::ActionMove( CTankAIBase::DirectionsEnum dir ) {
-	this->DoAction( TANK_ACTION_MOVE, this->DirectionToString( dir ) ); 
-}
-void CTankAIBase::ActionShoot( CTankAIBase::DirectionsEnum dir ) {
-	this->DoAction( TANK_ACTION_SHOOT, this->DirectionToString( dir ) ); 
-}
-void CTankAIBase::ActionRadar() {
-	this->DoAction( TANK_ACTION_RADAR, "" ); 
-}
-CTankAIBase::ResponseEnum CTankAIBase::CheckResponse() 
+
+void CTankAIBase::CheckResponse( std::string response  ) 
 {	
-	std::string response ; 
-	// std::cin >> response ;
-
 	// Debug 
 	// Example response 
 	// response = TANK_RESPONSE_PASS ; 
 	// response = TANK_RESPONSE_FAIL ; 
-	response = std::string ( TANK_RESPONSE_PASS ) + std::string( " enemy(1233,-3,100), projectile(1234,-5,100), projectile(1235,-15,100), projectile(1236,-10,100) \n" ) ; 
+	// response = std::string ( TANK_RESPONSE_PASS ) + std::string( " enemy(1233,-3,100), projectile(1234,-5,100), projectile(1235,-15,100), projectile(1236,-10,100) \n" ) ; 
 
-	// Check the response. 
-	if( response.find( TANK_RESPONSE_PASS ) == std::string::npos ) {
-		printf("Error: Could not understand response. response=[%s]\n", response.c_str() );
-		return CTankAIBase::FAIL ;
+	// Check the response
+	if( response.size() <= 0 ) {
+		// Nothing to do. 
+		return ;
 	}
+
 	// This is a good response. 
 	// Check for radar ping response and populate the m_objects with the information. 
-	this->ProcessRadarResponse( response );	
-
-	// Everything looks good. 
-	return CTankAIBase::PASS ;
-}
-
-void CTankAIBase::ProcessRadarResponse( std::string response ) 
-{
 	// Clear the object list as it is no longer valid. 
 	m_objects.clear(); 
 
 	unsigned int UUID ;
 	CTankAIObject::TypeEnum type;
-	char dx; 
-	char dy;
+	char x; 
+	char y;
 
     // regular expression
+	// Example:  enemy(1233,-3,100), projectile(1234,-5,100), projectile(1235,-15,100), projectile(1236,-10,100) 
 	const std::regex pattern("(projectile|enemy)\\(([0-9]+),-?([0-9]+),-?([0-9]+)\\)");
 	const std::regex patternNumber("-?([0-9]+)");
 
@@ -90,7 +49,7 @@ void CTankAIBase::ProcessRadarResponse( std::string response )
 
 		// Find the type 
 		if( singleObject.find( TANK_OBJECT_TYPE_ENEMY ) != std::string::npos ) {
-			type = CTankAIObject::enemy ; 
+			type = CTankAIObject::tank ; 
 		} else if( singleObject.find( TANK_OBJECT_TYPE_PROJECTILE ) != std::string::npos ) {
 			type = CTankAIObject::projectile ; 
 		} else {
@@ -108,16 +67,20 @@ void CTankAIBase::ProcessRadarResponse( std::string response )
 					UUID = atoi( (*it2).str().c_str() ); 
 					break; 
 				case 1:
-					dx = (char ) atoi( (*it2).str().c_str() ); 
+					x = (char ) atoi( (*it2).str().c_str() ); 
 					break; 
 				case 2:
-					dy = (char ) atoi( (*it2).str().c_str() ); 
+					y = (char ) atoi( (*it2).str().c_str() ); 
 					break; 
 			}
 			offset++; 
 		}
-		this->m_objects.push_back( CTankAIObject( UUID, type,	dx , dy ) ); 
+
+		
+
+		this->m_objects.push_back( CTankAIObject( UUID, type, x , y ) ); 
 		// std::cout << singleObject << "\n" ; // Debug 
 	}
-
 }
+
+
