@@ -10,7 +10,7 @@
 #include <iostream>
 #include <regex>
 
-
+unsigned int g_UUID =0; 
 
 void CTankAIBase::CheckResponse( std::string response  ) 
 {	
@@ -38,7 +38,7 @@ void CTankAIBase::CheckResponse( std::string response  )
 
     // regular expression
 	// Example:  enemy(1233,-3,100), projectile(1234,-5,100), projectile(1235,-15,100), projectile(1236,-10,100) 
-	const std::regex pattern("(projectile|enemy)\\(([0-9]+),-?([0-9]+),-?([0-9]+)\\)");
+	const std::regex pattern("(projectile|tank)\\(([0-9]+),-?([0-9]+),-?([0-9]+)\\)");
 	const std::regex patternNumber("-?([0-9]+)");
 
     const std::sregex_token_iterator end;
@@ -48,7 +48,7 @@ void CTankAIBase::CheckResponse( std::string response  )
 		std::string singleObject = (*it) ; 
 
 		// Find the type 
-		if( singleObject.find( TANK_OBJECT_TYPE_ENEMY ) != std::string::npos ) {
+		if( singleObject.find( TANK_OBJECT_TYPE_TANK ) != std::string::npos ) {
 			type = CTankAIObject::tank ; 
 		} else if( singleObject.find( TANK_OBJECT_TYPE_PROJECTILE ) != std::string::npos ) {
 			type = CTankAIObject::projectile ; 

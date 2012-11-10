@@ -13,8 +13,11 @@
 class CTankAIBotRamming : public CTankAIBase
 {
 	private:
+		
 		CTankAction::DirectionsEnum m_enemyDirection ; 
-		unsigned int CalculateDistance ( char x, char y); 	
+		unsigned char m_pingRate; 
+
+		unsigned int CalculateDistance ( const char x, const char y); 	
 		void UpdateEnemyDirection() ; 
 
 	public:

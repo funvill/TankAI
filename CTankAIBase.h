@@ -11,8 +11,11 @@
 #include <vector>
 #include "CTankAction.h"
 
-#define TANK_OBJECT_TYPE_ENEMY		"tank"
+#define TANK_OBJECT_TYPE_TANK		"tank"
 #define TANK_OBJECT_TYPE_PROJECTILE	"projectile"
+
+extern unsigned int g_UUID ; 
+
 
 class CTankAIObject 
 {
@@ -34,7 +37,6 @@ public:
 	}
 
 	CTankAIObject() {
-		static unsigned int g_UUID = 0 ; 
 		this->m_UUID = g_UUID++; 
 
 	}

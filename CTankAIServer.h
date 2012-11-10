@@ -1,3 +1,11 @@
+/******************************************************************************
+ *  Tank AI Programming challenge
+ *
+ *  Written by: Steven Smethurst 
+ *  Created: Nov 04, 2012 
+ * 
+ ******************************************************************************/
+
 #pragma once
 
 #include "CTankAIBase.h"
@@ -9,7 +17,8 @@
 
 #define TANK_SPEED				1 
 #define TANK_PROJECTILES		3 
-#define TANK_PROJECTILES_SPEED	2 
+#define TANK_PROJECTILES_SPEED	10 
+
 
 class CTankAIServerProjectile : public CTankAIObject 
 {
@@ -27,6 +36,10 @@ class CTankAIServerTank : public CTankAIObject
 		CTankAIBase	*				m_bot;
 		std::string					m_response; 
 		CTankAction					m_botAction;
+
+		CTankAIServerTank(); 
+		void Reset(); 
+		std::string GetName() ; 
 };
 
 
@@ -43,7 +56,7 @@ private:
 	void GoProjectiles(); 
 	void CheckForCrashes(); 
 
-	bool GoEndOfTurn(); 
+	bool GoEndOfTurn( ); 
 	void UpdateBotPing( CTankAIServerTank * playerInfo ); 
 	void DebugInfo(); 
 

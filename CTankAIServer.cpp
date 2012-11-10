@@ -1,7 +1,44 @@
+/******************************************************************************
+ *  Tank AI Programming challenge
+ *
+ *  Written by: Steven Smethurst 
+ *  Created: Nov 04, 2012 
+ * 
+ ******************************************************************************/
+
 #include "CTankAIServer.h"
 #include "CTankAction.h"
+#include "helpers.h"
 #include <sstream>
 #include <iostream>
+
+
+CTankAIServerTank::CTankAIServerTank() { 
+	this->m_UUID = g_UUID++ ; 
+}
+
+void CTankAIServerTank::Reset() {
+	// Reset bot running vars 
+	this->m_alive		= true ; 
+	this->m_type		= CTankAIObject::tank ; 
+	this->m_response	= ""; 
+	for( int i = 0 ; i < TANK_PROJECTILES ; i++ ) {
+		this->m_projectile[ i ].lifeSpan = 0 ; 
+	}
+
+	// Select a random location for this bot to start. 
+	// Note: the random location may be on top of another bot... oops bad luck. 
+	this->m_x = char (rand() % 256 ) ; 
+	this->m_y = char (rand() % 256 ) ; 
+}
+std::string CTankAIServerTank::GetName() {
+	if( this->m_bot == NULL ) {
+		return toString( this->m_UUID ) ; 
+	}
+
+	return this->m_bot->GetName() + toString( this->m_UUID ); 
+}
+
 
 CTankAIServer::CTankAIServer() {
 	this->m_UUID = 0 ; 
@@ -16,19 +53,7 @@ void CTankAIServer::AddBot( CTankAIBase * bot )  {
 void CTankAIServer::GameSetup() {
 	// Loop though all the bots and reset the bots stats 
 	for( std::vector<CTankAIServerTank *>::iterator playerOffset = this->m_players.begin(); playerOffset != this->m_players.end(); playerOffset++ ) {
-
-		// Reset bot running vars 
-		(*playerOffset)->m_alive	= true ; 
-		(*playerOffset)->m_type		= CTankAIObject::tank ; 
-		(*playerOffset)->m_response	= ""; 
-		for( int i = 0 ; i < TANK_PROJECTILES ; i++ ) {
-			(*playerOffset)->m_projectile[ i ].lifeSpan = 0 ; 
-		}
-
-		// Select a random location for this bot to start. 
-		// Note: the random location may be on top of another bot... oops bad luck. 
-		(*playerOffset)->m_x = char (rand() % 256 ) ; 
-		(*playerOffset)->m_y = char (rand() % 256 ) ; 
+		(*playerOffset)->Reset(); 	
 
 		m_stats["Bot.Count"]++; 
 	}
@@ -41,11 +66,13 @@ void CTankAIServer::Go() {
 		// Reset the game 
 		this->GameSetup(); 
 
+		m_stats["session"]++; 
+
 		// Loop though the turns 
 		bool done = false; 
 		for( size_t turnOffset = 0 ; turnOffset < MAX_TURN_COUNT && ! done ; turnOffset++ ) 
 		{
-			printf( "\nTurn %d\n", turnOffset ); 
+			// printf( "\nTurn %d\n", turnOffset ); 
 			// Loop though all the different players. 
 			for( std::vector<CTankAIServerTank *>::iterator playerOffset = this->m_players.begin(); playerOffset != this->m_players.end(); playerOffset++ ) 
 			{
@@ -67,24 +94,38 @@ void CTankAIServer::Go() {
 
 			// Respond to anyone that pinged the map. 
 			// Check for victory conditions 
-			done = this->GoEndOfTurn(); 
+			done = this->GoEndOfTurn( ); 
 
 			// Debug 
-			if( turnOffset % 10 == 0 ) {
+			/*
+			if( turnOffset % 50 == 0 ) {
 				this->DebugInfo(); 
+			}
+			*/
+		}
+
+		// Check for ties 
+		if( m_stats["Bot.Alive"] > 1 ) {
+			// This round ended in a tie. 
+			for( std::vector<CTankAIServerTank *>::iterator playerOffset = this->m_players.begin(); playerOffset != this->m_players.end(); playerOffset++ ) 
+			{
+				if( ! (*playerOffset)->m_alive ) {
+					continue; // This tank is already dead. 
+				}
+
+				// Debug message. 
+				printf( "bot %s surviced till the end of the game and tied with %d other bots\n", 
+									(*playerOffset)->GetName().c_str(), m_stats["Bot.Alive"]-1 ); 
+				this->m_stats[ (*playerOffset)->GetName() + std::string( ".Tie") ]++; 
+
 			}
 		}
 
-		// Print global stats
-		for( std::map<std::string, unsigned int>::iterator it = this->m_stats.begin() ; it != this->m_stats.end() ; it++ ) {
-			printf( "[%s]=%d\n", (*it).first.c_str(), (*it).second ); 
-		}
-	}
+		this->DebugInfo(); 
 
-	// Print global stats
-	for( std::map<std::string, unsigned int>::iterator it = this->m_stats.begin() ; it != this->m_stats.end() ; it++ ) {
-		printf( "[%s]=%d\n", (*it).first.c_str(), (*it).second ); 
+
 	}
+	this->DebugInfo(); 
 
 }
 
@@ -111,6 +152,9 @@ void CTankAIServer::GoProjectiles()
 				// loop though the players looking for people that got hit by this projectiles. 
 				for( std::vector<CTankAIServerTank *>::iterator playerOffset = this->m_players.begin(); playerOffset != this->m_players.end(); playerOffset++ ) 
 				{
+					if( ! (*playerOffset)->m_alive ) {
+						continue; // This tank is already dead. 
+					}
 					if( (*projectilesPlayerOffset)->m_projectile[projectilesOffset].m_x == (*playerOffset)->m_x && 
 						(*projectilesPlayerOffset)->m_projectile[projectilesOffset].m_y == (*playerOffset)->m_y )
 					{
@@ -119,13 +163,13 @@ void CTankAIServer::GoProjectiles()
 						(*playerOffset)->m_alive = false; 
 
 						// Debug message. 
-						printf( "bot (%s) was killed by projectile (%d) shot by (%s)\n", 
-											(*playerOffset)->m_bot->GetName().c_str(),
+						printf( "bot %s was killed by projectile (%d) shot by %s\n", 
+											(*playerOffset)->GetName().c_str(), 
 											(*projectilesPlayerOffset)->m_projectile[projectilesOffset].m_UUID,
-											(*projectilesPlayerOffset)->m_bot->GetName().c_str() ); 
-						// ToDo: add stats to check for bot accuracy 
-						this->m_stats[ (*playerOffset)->m_bot->GetName() + std::string( ".DeadByProjectile") ]++; 
-						this->m_stats[ (*projectilesPlayerOffset)->m_bot->GetName() + std::string( ".KillByProjectile") ]++; 
+											(*projectilesPlayerOffset)->GetName().c_str() ); 
+						// Add stats to check for bot accuracy 
+						this->m_stats[ (*playerOffset)->GetName() + std::string( ".DeadByProjectile") ]++; 
+						this->m_stats[ (*projectilesPlayerOffset)->GetName() + std::string( ".KillsByProjectile") ]++; 
 					}
 				}
 			}
@@ -149,12 +193,12 @@ void CTankAIServer::CheckForCrashes() {
 
 			if( (*playerCrashOffset)->m_x == (*playerOffset)->m_x && (*playerCrashOffset)->m_y == (*playerOffset)->m_y ){
 				// These two thanks crashed in to each other. 
-				printf( "Bot (%s) crashed in to bot (%s) killing both\n", (*playerCrashOffset)->m_bot->GetName().c_str(), (*playerOffset)->m_bot->GetName().c_str() ) ; 
+				printf( "Bot %s crashed in to bot %s killing both\n", (*playerCrashOffset)->GetName().c_str(), (*playerOffset)->GetName().c_str() ) ; 
 				(*playerCrashOffset)->m_alive = false; 
 				(*playerOffset)->m_alive = false; 
 
-				this->m_stats[ (*playerCrashOffset)->m_bot->GetName() + std::string( ".DeadByCrash") ]++; 
-				this->m_stats[ (*playerOffset)->m_bot->GetName() + std::string( ".DeadByCrash") ]++; 
+				this->m_stats[ (*playerCrashOffset)->GetName() + std::string( ".DeadByCrash") ]++; 
+				this->m_stats[ (*playerOffset)->GetName() + std::string( ".DeadByCrash") ]++; 
 
 				break; 
 			}
@@ -167,12 +211,14 @@ bool CTankAIServer::GoEndOfTurn() {
 	// Check for victory conditions 
 
 	unsigned int aliveTanks = 0 ; 
-
+	CTankAIServerTank * lastAliveTank = NULL ; 
 	for( std::vector<CTankAIServerTank *>::iterator playerOffset = this->m_players.begin(); playerOffset != this->m_players.end(); playerOffset++ ) 
 	{
 		if( ! (*playerOffset)->m_alive ) {
 			continue ; // This player is dead continue; 
 		}
+
+		lastAliveTank = (*playerOffset) ; 
 		
 		// There is one more alive tank.
 		aliveTanks++ ; 
@@ -185,9 +231,15 @@ bool CTankAIServer::GoEndOfTurn() {
 	}
 
 	m_stats["Bot.Alive"] = aliveTanks ; 
-	printf( "Alive tanks=%d\n", aliveTanks ); 
+	// printf( "Alive tanks=%d\n", aliveTanks ); 
 
-	if( aliveTanks <= 0  ) {
+	if( aliveTanks <= 1  ) {
+		// We have a winner 
+		if( lastAliveTank != NULL ) {
+			printf("\n\nWinner ! %s\n\n", lastAliveTank->GetName().c_str() ); 
+			this->m_stats[ lastAliveTank->GetName() + std::string( ".Winner") ]++; 
+		}
+
 		return true ; // One or less tanks are left.
 	}
 
@@ -205,13 +257,15 @@ void CTankAIServer::UpdateBotPing( CTankAIServerTank * playerInfo ) {
 	// Loop though all the bots including yourself
 	for( std::vector<CTankAIServerTank *>::iterator playerOffset = this->m_players.begin(); playerOffset != this->m_players.end(); playerOffset++ ) 
 	{
-		// Print tank location. 
-		ss << TANK_OBJECT_TYPE_ENEMY << "(" << (*playerOffset)->m_UUID << ", " << playerInfo->m_x - (*playerOffset)->m_x << ", " << playerInfo->m_y - (*playerOffset)->m_y << "), " ; 
+		if( (*playerOffset)->m_alive ) { 
+			// Print tank location. 
+			ss << TANK_OBJECT_TYPE_TANK << "(" << (*playerOffset)->m_UUID << "," << playerInfo->m_x - (*playerOffset)->m_x << "," << playerInfo->m_y - (*playerOffset)->m_y << "), " ; 
+		}
 
 		// Print projectile
 		for( int projectileOffset = 0 ; projectileOffset < TANK_PROJECTILES; projectileOffset++ ) {
 			if( (*playerOffset)->m_projectile[ projectileOffset ].lifeSpan > 0 ) {
-				ss << TANK_OBJECT_TYPE_PROJECTILE << "(" << (*playerOffset)->m_projectile[ projectileOffset ].m_UUID << ", "  << playerInfo->m_x - (*playerOffset)->m_projectile[ projectileOffset ].m_x << ", "  << playerInfo->m_y - (*playerOffset)->m_projectile[ projectileOffset ].m_y << "), " ; 
+				ss << TANK_OBJECT_TYPE_PROJECTILE << "(" << (*playerOffset)->m_projectile[ projectileOffset ].m_UUID << ","  << playerInfo->m_x - (*playerOffset)->m_projectile[ projectileOffset ].m_x << ","  << playerInfo->m_y - (*playerOffset)->m_projectile[ projectileOffset ].m_y << "), " ; 
 			}
 		}
 	}
@@ -226,53 +280,59 @@ void CTankAIServer::GoBot( CTankAIServerTank * playerInfo ) {
 	}
 
 	// Print some info about this player. 
-	printf( "Bot:%s(%d,%d) << ",  playerInfo->m_bot->GetName().c_str(), playerInfo->m_x, playerInfo->m_y ); 
+	/*
+	if( playerInfo->m_response.size() > 0 ) {
+		printf( "Bot:%s >> %s \n",  playerInfo->GetName().c_str(), playerInfo->m_response.c_str() ); 
+	}
+	*/
+	// printf( "Bot:%s << ",  playerInfo->GetName().c_str() ); 
 
 	// Get the players actions 
 	std::string playerActionString = playerInfo->m_bot->Go( playerInfo->m_response ) ; 
-	printf( playerActionString.c_str() ); 
+	// printf( playerActionString.c_str() ); 
 	
 	playerInfo->m_botAction.Decode( playerActionString ) ; 
+	playerInfo->m_response = "" ; 
 
 	// Do the action depending on the bots command. 		
 	switch( playerInfo->m_botAction.m_action) {
 		case CTankAction::MOVE:
 		{
 			MoveObject( *playerInfo, playerInfo->m_botAction.m_direction ); 
-			this->m_stats[ playerInfo->m_bot->GetName() + std::string( ".action.move") ]++; 
+			this->m_stats[ playerInfo->GetName() + std::string( ".action.move") ]++; 
 			break; 			
 		}
 		case CTankAction::SHOOT:
 		{
-			this->m_stats[ playerInfo->m_bot->GetName() + std::string( ".action.shoot") ]++; 
+			this->m_stats[ playerInfo->GetName() + std::string( ".action.shoot") ]++; 
 
 			// Search for a free bullet 
-			bool found = false; 
+			bool missfired = true; 
 			for( int offset = 0 ; offset < TANK_PROJECTILES; offset++ ) {
 				if( playerInfo->m_projectile[ offset ].lifeSpan <= 0 ) {
 					// We found an unactivated bullet. 
-					// Activate it and set it on its way. 
-					playerInfo->m_projectile[ offset ].Set( this->m_UUID++, CTankAIObject::projectile, playerInfo->m_x, playerInfo->m_y); 
+					// Activate it and set it on its way. 					
+					playerInfo->m_projectile[ offset ].Set( g_UUID++, CTankAIObject::projectile, playerInfo->m_x, playerInfo->m_y); 
 					playerInfo->m_projectile[ offset ].lifeSpan = 0xff ; 
 					playerInfo->m_projectile[ offset ].m_direction = playerInfo->m_botAction.m_direction ; 
-					found =true ; 
+					missfired = false ; 
 
-					printf( "FYI: Projectile (%d) created\n", playerInfo->m_projectile[ offset ].m_UUID );
-					this->m_stats[ playerInfo->m_bot->GetName() + std::string( ".shots") ]++; 
+					// printf( "FYI: Projectile (%d) created\n", playerInfo->m_projectile[ offset ].m_UUID );
+					this->m_stats[ playerInfo->GetName() + std::string( ".shots") ]++; 
 					break; 
 				}
 			}
 
-			if( ! found ) {
-				printf( "FYI: All projectile are in use. \n" );
-				this->m_stats[ playerInfo->m_bot->GetName() + std::string( ".missfire") ]++; 
+			if( missfired ) {
+				// printf( "FYI: All projectile are in use. \n" );
+				this->m_stats[ playerInfo->GetName() + std::string( ".missfire") ]++; 
 			}
 
 			break; 			
 		}
 		case CTankAction::PING:
 		{
-			this->m_stats[ playerInfo->m_bot->GetName() + std::string( ".action.ping") ]++; 
+			this->m_stats[ playerInfo->GetName() + std::string( ".action.ping") ]++; 
 			// Delayed until after everyone has moved and shot. 
 			// Do nothing 
 			break; 			
@@ -326,12 +386,14 @@ void CTankAIServer::DebugInfo() {
 }
 
 void CTankAIServer::PrintPlayerInfo( CTankAIServerTank & playersInfo ) {
-	printf( "| %s\n", playersInfo.m_bot->GetName().c_str() ); 
-	printf( "|   UUID=[%d], x=%d, y=%d\n", playersInfo.m_UUID, (int) playersInfo.m_x, (int) playersInfo.m_y ) ; 
+	printf( "| %s=%d\n", playersInfo.GetName().c_str(), playersInfo.m_alive ); 
+	if( playersInfo.m_alive ) {
+		printf( "|   UUID=[%d], x=%d, y=%d\n", playersInfo.m_UUID, (int) playersInfo.m_x, (int) playersInfo.m_y ) ; 
+	}
 	for( int offset = 0 ; offset < TANK_PROJECTILES ; offset++ ) {
 		if( playersInfo.m_projectile[ offset ].lifeSpan > 0 ) {
 			printf( "|   Projectiles life=[%d], UUID=[%d], x=[%d], y=[%d]\n", playersInfo.m_projectile[ offset ].lifeSpan, playersInfo.m_projectile[ offset ].m_UUID, (int) playersInfo.m_projectile[ offset ].m_x, (int) playersInfo.m_projectile[ offset ].m_y ); 
 		}
 	}
-	printf( "*-------------------------------------------------*\n" ) ; 
+	
 }

@@ -12,8 +12,9 @@
 
 CTankAIBotRamming::CTankAIBotRamming() {
 	this->m_enemyDirection = CTankAction::NORTH ; 
+	this->m_pingRate	   = 10; 
 }
-unsigned int CTankAIBotRamming::CalculateDistance ( char x, char y) {
+unsigned int CTankAIBotRamming::CalculateDistance ( const char x, const char y) {
 	return abs( x ) + abs( y ) ; 
 
 }
@@ -34,7 +35,7 @@ std::string CTankAIBotRamming::Go( std::string serverResponse )
 	static unsigned char turnCount = 0 ; 
 	turnCount++; 
 
-	if( turnCount % 5 == 0 || turnCount == 1 ) {
+	if( turnCount % this->m_pingRate == 0 || turnCount == 1 ) {
 		// Ping to update the map 
 		// The first turn we should ping to find the location of all the enemies. 
 		this->m_actions.Set( CTankAction::PING ); 
@@ -57,7 +58,7 @@ void CTankAIBotRamming::UpdateEnemyDirection() {
 		return ; // Nothing to do. 
 	}
 
-	unsigned int distance = 0 ; 
+	unsigned int shortestDistance = 255 ; 
 	char dx, dy ; 
 
 	// Loop though all the objects on the map to find the closest enemy. 
@@ -66,20 +67,30 @@ void CTankAIBotRamming::UpdateEnemyDirection() {
 		if( (*it).m_type == CTankAIObject::tank ) {
 			// If this is the first enemy or 
 			// if this enemy is closer then the last closest one. 
-			if( it == this->m_objects.begin() || 
-				distance > this->CalculateDistance( (*it).m_x, (*it).m_y )) 
+			unsigned int calDistance = this->CalculateDistance( (*it).m_x, (*it).m_y ) ; 
+
+			if( shortestDistance > calDistance && calDistance != 0 ) 
 			{
 				dx = (*it).m_x ; 
 				dy = (*it).m_y ; 
-				distance = this->CalculateDistance( (*it).m_x, (*it).m_y ) ; 
+				shortestDistance = calDistance ; 
 			}
 		}					
 	}
 
+	if( shortestDistance <= 10 ) {
+		this->m_pingRate = shortestDistance/2 ; 
+		if( this->m_pingRate < 2 ) {
+			this->m_pingRate = 2 ; 
+		}
+	} else {
+		this->m_pingRate = 10 ; 
+	}
+
 	// Update the direction. 
-	if( abs( dx ) > abs( dy ) ) {
+	if( abs( dx ) >= abs( dy ) ) {
 		// East or west 
-		if( dx > 0 ) {
+		if( dx < 0 ) {
 			this->m_enemyDirection = CTankAction::EAST ; 
 		} else {
 			this->m_enemyDirection = CTankAction::WEST ; 
@@ -92,4 +103,5 @@ void CTankAIBotRamming::UpdateEnemyDirection() {
 			this->m_enemyDirection = CTankAction::SOUTH ; 
 		}
 	}
+
 }

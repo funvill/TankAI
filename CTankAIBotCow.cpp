@@ -1,3 +1,11 @@
+/******************************************************************************
+ *  Tank AI Programming challenge
+ *
+ *  Written by: Steven Smethurst 
+ *  Created: Nov 04, 2012 
+ * 
+ ******************************************************************************/
+
 #include "CTankAIBotCow.h"
 
 CTankAction::DirectionsEnum CTankAIBotCow::GetRandomDirection() {
@@ -21,6 +29,7 @@ CTankAction::DirectionsEnum CTankAIBotCow::GetRandomDirection() {
 
 std::string CTankAIBotCow::Go( std::string command ) {
 	this->m_actions.Set( CTankAction::MOVE, this->GetRandomDirection() ); 
-	this->m_actions.Set( CTankAction::SHOOT, CTankAction::NORTH ); 
+	// this->m_actions.Set( CTankAction::SHOOT, CTankAction::NORTH ); 
+	// this->m_actions.Set( CTankAction::PING ); 
 	return this->m_actions.Encode(); 
 }
