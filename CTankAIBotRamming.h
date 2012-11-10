@@ -20,7 +20,7 @@ class CTankAIBotRamming : public CTankAIBase
 	public:
 		CTankAIBotRamming(); 
 		std::string Go( std::string command ) ; 
-
+		std::string GetName() { return "BotRamming"; } ;
 	
 };
 

@@ -16,5 +16,6 @@ private:
 
 public:
 	std::string Go( std::string command ) ; 
+	std::string GetName() { return "BotRandom"; } ;
 };
 

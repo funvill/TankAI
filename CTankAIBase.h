@@ -11,7 +11,7 @@
 #include <vector>
 #include "CTankAction.h"
 
-#define TANK_OBJECT_TYPE_ENEMY		"enemy"
+#define TANK_OBJECT_TYPE_ENEMY		"tank"
 #define TANK_OBJECT_TYPE_PROJECTILE	"projectile"
 
 class CTankAIObject 
@@ -26,11 +26,11 @@ public:
 	char m_x ; 
 	char m_y ; 
 
-	void Set( unsigned int UUID, TypeEnum type, char dx, char dy ) {
+	void Set( unsigned int UUID, TypeEnum type, char x, char y ) {
 		this->m_UUID = UUID ; 
 		this->m_type = type ; 
-		this->m_x = dx ; 
-		this->m_y = dy ; 
+		this->m_x = x ; 
+		this->m_y = y ; 
 	}
 
 	CTankAIObject() {
@@ -62,6 +62,7 @@ class CTankAIBase
 		 * 
 		 */ 
 		virtual std::string Go( std::string serverResponse = "" ) = 0 ; 
+		virtual std::string GetName() = 0 ; 
 
 		// This will process the response and check for error messages. 
 		void CheckResponse( std::string response ); 		

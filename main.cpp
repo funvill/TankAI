@@ -1,3 +1,4 @@
+
 // TankAIBot.cpp : Defines the entry point for the console application.
 //
 
@@ -16,9 +17,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	
 	// server.AddPlayer( new CTankAIBotCow() ); 
-	server.AddPlayer( new CTankAIBotCow() ); 
-	server.AddPlayer( new CTankAIBotRandom()  ); 
-	server.AddPlayer( new CTankAIBotRamming() ); 
+	server.AddBot( new CTankAIBotCow() ); 
+	server.AddBot( new CTankAIBotRandom()  ); 
+	server.AddBot( new CTankAIBotRamming() ); 
+	server.AddBot( new CTankAIBotRamming() ); 
+	server.AddBot( new CTankAIBotRamming() ); 
+	server.AddBot( new CTankAIBotRamming() ); 
 	
 	server.Go(); 
 

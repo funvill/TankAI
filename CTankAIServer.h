@@ -2,8 +2,11 @@
 
 #include "CTankAIBase.h"
 #include <vector>
+#include <map>
 
+#define MAX_SESSION_COUNT		100 
 #define MAX_TURN_COUNT			256*100
+
 #define TANK_SPEED				1 
 #define TANK_PROJECTILES		3 
 #define TANK_PROJECTILES_SPEED	2 
@@ -19,16 +22,11 @@ class CTankAIServerProjectile : public CTankAIObject
 class CTankAIServerTank : public CTankAIObject
 {
 	public:
-
-		CTankAIServerTank() {
-			this->m_type = CTankAIObject::tank ;
-			for( int i = 0 ; i < TANK_PROJECTILES ; i++ ) {
-				this->m_projectile[ i ].lifeSpan = 0 ; 
-			}
-		}
-
-		unsigned char				m_bullets; 
+		bool						m_alive; 
 		CTankAIServerProjectile		m_projectile[ TANK_PROJECTILES ] ; 
+		CTankAIBase	*				m_bot;
+		std::string					m_response; 
+		CTankAction					m_botAction;
 };
 
 
@@ -36,18 +34,19 @@ class CTankAIServerTank : public CTankAIObject
 class CTankAIServer
 {
 private:
-	unsigned int					m_UUID ; 
-	std::vector<CTankAIBase *>		m_players ; 
+	unsigned int						m_UUID ; 
+	std::vector<CTankAIServerTank *>	m_players ; 
+	std::map<std::string, unsigned int>	m_stats; 
 
-	// Current players info 
-	CTankAIServerTank	m_playerOneInfo ; 
-	CTankAIServerTank	m_playerTwoInfo ; 
+	void GameSetup(); 
+	void GoBot( CTankAIServerTank * playerInfo ) ; 
+	void GoProjectiles(); 
+	void CheckForCrashes(); 
 
+	bool GoEndOfTurn(); 
+	void UpdateBotPing( CTankAIServerTank * playerInfo ); 
+	void DebugInfo(); 
 
-	void Reset(); 
-	void RunBattle( CTankAIBase * playerOne, CTankAIBase * playerTwo, unsigned int turnCount ) ; 
-
-	void RunPlayer( CTankAIBase * playerBot, CTankAIServerTank & playersInfo, std::string & playerServerResponse, CTankAIServerTank & enemyBot ); 
 	void MoveObject( CTankAIObject & object, CTankAction::DirectionsEnum direction ); 
 
 
@@ -59,6 +58,6 @@ public:
 	CTankAIServer();
 
 	void Go(); 
-	void AddPlayer( CTankAIBase * player ) ; 
+	void AddBot( CTankAIBase * bot ) ; 
 };
 
