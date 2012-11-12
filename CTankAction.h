@@ -12,6 +12,10 @@
 #include <iostream>
 #include <regex>
 
+#define TANK_SPEED				1 
+#define TANK_PROJECTILES		3 
+#define TANK_PROJECTILES_SPEED	10 
+
 class CTankAction
 {
 	public:

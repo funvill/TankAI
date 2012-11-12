@@ -15,10 +15,6 @@
 #define MAX_SESSION_COUNT		100 
 #define MAX_TURN_COUNT			256*100
 
-#define TANK_SPEED				1 
-#define TANK_PROJECTILES		3 
-#define TANK_PROJECTILES_SPEED	10 
-
 
 class CTankAIServerProjectile : public CTankAIObject 
 {

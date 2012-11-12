@@ -5,6 +5,7 @@
  *  Created: Nov 04, 2012 
  * 
  ******************************************************************************/
+#pragma once
 
 #include <string>
 #include <algorithm> 

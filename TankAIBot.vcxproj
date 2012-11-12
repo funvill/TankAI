@@ -82,8 +82,10 @@
     <ClInclude Include="CTankAction.h" />
     <ClInclude Include="CTankAIBase.h" />
     <ClInclude Include="CTankAIBotCow.h" />
+    <ClInclude Include="CTankAIBotMrClever.h" />
     <ClInclude Include="CTankAIBotRamming.h" />
     <ClInclude Include="CTankAIBotRandom.h" />
+    <ClInclude Include="CTankAIBotRock.h" />
     <ClInclude Include="CTankAIServer.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="stdafx.h" />
@@ -93,8 +95,10 @@
     <ClCompile Include="CTankAction.cpp" />
     <ClCompile Include="CTankAIBase.cpp" />
     <ClCompile Include="CTankAIBotCow.cpp" />
+    <ClCompile Include="CTankAIBotMrClever.cpp" />
     <ClCompile Include="CTankAIBotRamming.cpp" />
     <ClCompile Include="CTankAIBotRandom.cpp" />
+    <ClCompile Include="CTankAIBotRock.cpp" />
     <ClCompile Include="CTankAIServer.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="main.cpp" />

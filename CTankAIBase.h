@@ -14,8 +14,8 @@
 #define TANK_OBJECT_TYPE_TANK		"tank"
 #define TANK_OBJECT_TYPE_PROJECTILE	"projectile"
 
+// This is a global var used to give evert object in the game a uniquee number. 
 extern unsigned int g_UUID ; 
-
 
 class CTankAIObject 
 {
@@ -64,7 +64,8 @@ class CTankAIBase
 		 * 
 		 */ 
 		virtual std::string Go( std::string serverResponse = "" ) = 0 ; 
-		virtual std::string GetName() = 0 ; 
+		virtual const std::string GetName() = 0 ; 
+		virtual void Reset() {} ; 
 
 		// This will process the response and check for error messages. 
 		void CheckResponse( std::string response ); 		

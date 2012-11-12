@@ -30,6 +30,8 @@ void CTankAIServerTank::Reset() {
 	// Note: the random location may be on top of another bot... oops bad luck. 
 	this->m_x = char (rand() % 256 ) ; 
 	this->m_y = char (rand() % 256 ) ; 
+
+	this->m_bot->Reset(); 
 }
 std::string CTankAIServerTank::GetName() {
 	if( this->m_bot == NULL ) {
@@ -97,11 +99,9 @@ void CTankAIServer::Go() {
 			done = this->GoEndOfTurn( ); 
 
 			// Debug 
-			/*
 			if( turnOffset % 50 == 0 ) {
 				this->DebugInfo(); 
 			}
-			*/
 		}
 
 		// Check for ties 
@@ -114,7 +114,7 @@ void CTankAIServer::Go() {
 				}
 
 				// Debug message. 
-				printf( "bot %s surviced till the end of the game and tied with %d other bots\n", 
+				printf( "bot %s survived till the end of the game and tied with %d other bots\n", 
 									(*playerOffset)->GetName().c_str(), m_stats["Bot.Alive"]-1 ); 
 				this->m_stats[ (*playerOffset)->GetName() + std::string( ".Tie") ]++; 
 
@@ -285,11 +285,10 @@ void CTankAIServer::GoBot( CTankAIServerTank * playerInfo ) {
 		printf( "Bot:%s >> %s \n",  playerInfo->GetName().c_str(), playerInfo->m_response.c_str() ); 
 	}
 	*/
-	// printf( "Bot:%s << ",  playerInfo->GetName().c_str() ); 
-
+	
 	// Get the players actions 
 	std::string playerActionString = playerInfo->m_bot->Go( playerInfo->m_response ) ; 
-	// printf( playerActionString.c_str() ); 
+	printf( "Bot:%s << %s ",  playerInfo->GetName().c_str(), playerActionString.c_str() ); 
 	
 	playerInfo->m_botAction.Decode( playerActionString ) ; 
 	playerInfo->m_response = "" ; 

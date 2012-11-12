@@ -45,6 +45,12 @@
     <ClInclude Include="helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CTankAIBotMrClever.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTankAIBotRock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -69,6 +75,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CTankAIBotCow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTankAIBotMrClever.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTankAIBotRock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

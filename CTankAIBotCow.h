@@ -18,6 +18,6 @@ class CTankAIBotCow : public CTankAIBase
 
 	public:
 		std::string Go( std::string command ) ; 
-		std::string GetName() { return "BotCow"; } ;
+		std::string const GetName() { return "BotCow"; } ;
 };
 
